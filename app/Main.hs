@@ -1,6 +1,10 @@
-module Xmast where
+module Main where
 
 import Data.List (intersperse)
+
+data Tier = Branch Int
+          | Trunk
+          | Peak
 
 trunk = "||"
 
