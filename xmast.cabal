@@ -27,6 +27,7 @@ executable xmast-exe
   build-depends:       base
                      , free
                      , xmast
+                     , ansi-terminal
   default-language:    Haskell2010
 
 test-suite xmast-test

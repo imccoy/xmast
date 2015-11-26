@@ -3,6 +3,7 @@ module Main where
 import Control.Monad (forM_)
 import Control.Monad.Free
 import Data.List (intersperse)
+import System.Console.ANSI
 
 data Tree next = Branch Int next
                | Trunk next
@@ -17,6 +18,17 @@ sTree STrunk = "||"
 sTree (LBranch n) = "\\" ++ replicate n '_'
 sTree (RBranch n) = replicate n '_' ++ "/"
 sTree (Pad n) = replicate n ' '
+
+ioTree :: STree -> IO ()
+ioTree t =
+  do
+    setSGR [SetColor Foreground (brightness t) (color t)]
+    putStr (sTree t)
+  where
+    color STrunk = Green
+    color _ = Green
+    brightness STrunk = Dull
+    brightness _ = Vivid
 
 type TreeM = Free Tree
 
@@ -41,7 +53,6 @@ runList t = runList' t
     runList' (Free (Done)) = []
     runList' (Pure _) = []
 
-
 tree :: TreeM ()
 tree = do
   forM_ [0, 2..40] $ \n -> do
@@ -53,5 +64,8 @@ tree = do
 
 main = do
   let commands = runList tree
-  let lines = [concat (map sTree commandLine) | commandLine <- commands]
-  mapM putStrLn lines
+  let lines = [map ioTree commandLine | commandLine <- commands]
+  forM_ lines $ \line -> do
+    sequence line
+    putStrLn ""
+  setSGR [Reset]
